@@ -47,10 +47,11 @@ export class ProductionJobHandler extends JobHandler {
     ];
 
     if (this.currJob.payload.isNextGen) {
-      const manifestPrefix = this.currJob.payload.manifestPrefix;
       this.currJob.deployCommands[
         this.currJob.deployCommands.length - 1
       ] = `make next-gen-deploy MUT_PREFIX=${this.currJob.payload.mutPrefix}`;
+      // TODO: Remove functionality of manifestPrefix
+      const manifestPrefix = this.currJob.payload.manifestPrefix;
       if (manifestPrefix) {
         const searchFlag = this.currJob.payload.stable;
         this.currJob.deployCommands[
@@ -124,14 +125,15 @@ async getPathPrefix(): Promise<string> {
   }
 
   async deploy(): Promise<CommandExecutorResponse> {
-    const resp = await this.deployGeneric();
     try {
+      const resp = await this.deployGeneric();
       if (resp && resp.output) {
         const makefileOutput = resp.output.replace(/\r/g, '').split(/\n/);
         await this.purgePublishedContent(makefileOutput);
         await this.logger.save(this.currJob._id, `${'(prod)'.padEnd(15)}Finished pushing to production`);
         await this.logger.save(this.currJob._id, `${'(prod)'.padEnd(15)}Deploy details:\n\n${resp.output}`);
       }
+      // TODO: Create and kick off manifestJobHandler here
       return resp;
     } catch (errResult) {
       await this.logger.save(this.currJob._id, `${'(prod)'.padEnd(15)}stdErr: ${errResult.stderr}`);
