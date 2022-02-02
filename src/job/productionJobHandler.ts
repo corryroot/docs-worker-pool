@@ -133,7 +133,6 @@ async getPathPrefix(): Promise<string> {
         await this.logger.save(this.currJob._id, `${'(prod)'.padEnd(15)}Finished pushing to production`);
         await this.logger.save(this.currJob._id, `${'(prod)'.padEnd(15)}Deploy details:\n\n${resp.output}`);
       }
-      // TODO: Create and kick off manifestJobHandler here
       return resp;
     } catch (errResult) {
       await this.logger.save(this.currJob._id, `${'(prod)'.padEnd(15)}stdErr: ${errResult.stderr}`);
